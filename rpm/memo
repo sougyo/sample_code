@@ -1,0 +1,2 @@
+rpmbuild -ba hello.spec
+https://rpm-packaging-guide.github.io/

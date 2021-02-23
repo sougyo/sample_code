@@ -1,0 +1,49 @@
+---
+- hosts: all
+  vars:
+    http_port: 3003
+  tasks:
+  - yum:
+      name: httpd
+  - file:
+      path: /test/vhost1
+      state: directory
+  - copy:
+      content: |
+        <VirtualHost *:{{ http_port }}>
+          DocumentRoot /test/vhost1
+          <Directory "/test">
+            Require all granted
+          </Directory>
+        </VirtualHost>
+      dest: /etc/httpd/conf.d/vhost1.conf
+  - lineinfile:
+      path: /etc/httpd/conf/httpd.conf
+      line: "Listen {{ http_port }}"
+  - copy:
+      content: hello world
+      dest: /test/vhost1/index.html
+  - seport:
+      ports: "{{ http_port }}"
+      proto: tcp
+      setype: http_port_t
+      state: present
+  - sefcontext:
+      target: '/test/vhost1(/.*)?'
+      setype: httpd_sys_rw_content_t
+  - command: restorecon -Rv /test
+  - firewalld:
+      port: "{{ http_port }}/tcp"
+      permanent: yes
+      immediate: yes
+      state: enabled
+  - service:
+      name: httpd
+      state: restarted
+
+- hosts: localhost
+  tasks:
+  - uri:
+      url: "http://{{ item }}:3003"
+    loop:
+      - host1
