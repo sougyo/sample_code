@@ -1,0 +1,35 @@
+---
+- hosts: all
+  tasks:
+  - yum:
+      name: vsftpd
+  - lineinfile:
+      path: /etc/vsftpd/vsftpd.conf
+      regexp: anonymous_enable
+      line: anonymous_enable=YES
+  - lineinfile:
+      path: /etc/vsftpd/vsftpd.conf
+      regexp: anon_upload_enable
+      line: anon_upload_enable=YES
+  - file:
+      path: /var/ftp/pub
+      state: directory
+      mode: '0777'
+  - sefcontext:
+      target: '/var/ftp/pub(/.*)?'
+      setype: public_content_rw_t
+      state: present
+  - seboolean:
+      name: ftpd_anon_write
+      state: yes
+      persistent: yes
+  - command: restorecon -Rv /var/ftp/pub
+  - service:
+      name: vsftpd
+      state: started
+      enabled: yes
+  - firewalld:
+      service: ftp
+      permanent: yes
+      state: enabled
+     
