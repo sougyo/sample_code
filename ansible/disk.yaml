@@ -1,0 +1,53 @@
+---
+- hosts: all
+  tasks:
+  - fail: msg="/dev/sdb is not defined"
+    when: ansible_facts['devices']['sdb'] is not defined
+  - fail: msg="size of /dev/sdb is greater than 3GiB"
+    when: (ansible_facts['devices']['sdb']['size'] | human_to_bytes) > 3 * 1024 * 1024 * 1024 
+  - block: 
+    - mount:
+        path: /mnt
+        state: absent
+    - command: "dd if=/dev/zero of=/dev/sdb bs=1k count=10k"
+    - reboot:
+    tags: reset_disk, never
+  - parted:
+      device: /dev/sdb
+      number: 1
+      state: present
+      part_end: 100MiB
+  - parted:
+      device: /dev/sdb
+      number: 2
+      state: present
+      part_start: 100MiB
+      part_end: 300MiB
+  - parted:
+      device: /dev/sdb
+      number: 3
+      state: present
+      part_start: 300MiB
+      part_end: 500MiB
+  - lvg:
+      vg: myvg
+      pvs: /dev/sdb2,/dev/sdb3
+      pesize: 128K
+  - lvol:
+      vg: myvg
+      lv: myvol
+      size: 300m
+  - filesystem:
+      fstype: xfs
+      dev: /dev/mapper/myvg-myvol
+  - mount:
+      path: /mnt
+      src: /dev/mapper/myvg-myvol
+      fstype: xfs
+      state: mounted
+  - command: "df -h"
+    changed_when: false
+    register: result
+  - assert:
+      that:
+      - "{{ result.stdout.find('/dev/mapper/myvg-myvol') }}"
