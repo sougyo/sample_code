@@ -1,0 +1,15 @@
+---
+- hosts: all
+  vars:
+    nginx_vhosts:
+      - listen: "80"
+        server_name: "example.com"
+        root: "/var/www/example.com"
+  tasks:
+  - file:
+      path: /var/www/example.com
+      recurse: true
+      state: directory
+  - include_role:
+      name: geerlingguy.nginx
+  

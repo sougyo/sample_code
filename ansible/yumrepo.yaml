@@ -1,0 +1,17 @@
+---
+- hosts: all
+  vars:
+    enabled_repos:
+    - /etc/yum.repos.d/CentOS-Stream-AppStream.repo
+    - /etc/yum.repos.d/CentOS-Stream-BaseOS.repo
+  tasks:
+  - find:
+      paths: /etc/yum.repos.d
+      patterns: '*.repo'
+    register: repolist
+  - lineinfile:
+      name: "{{ item }}"
+      regexp: ^enabled
+      line: >-
+        {%- if item in enabled_repos -%} enabled=1 {%- else -%} enabled=0 {%- endif -%}
+    loop: "{{ repolist['files'] | map(attribute='path') | list }}"
