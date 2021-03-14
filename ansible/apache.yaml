@@ -1,0 +1,15 @@
+---
+- hosts: all
+  vars:
+    apache_listen_ip: "*"
+  roles:
+  - geerlingguy.apache
+  tasks:
+  - firewalld:
+      service: "{{ item }}"
+      permanent: yes
+      immediate: yes
+      state: enabled
+    loop:
+      - http
+      - https
