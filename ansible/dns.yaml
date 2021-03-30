@@ -1,0 +1,74 @@
+- hosts: all
+  vars:
+    chroot: false
+  tasks:
+    - yum:
+        name: bind
+    - yum:
+        name: bind-chroot
+        state: "{{ 'present' if (chroot) else 'absent' }}"
+    - firewalld:
+        service: dns
+        state: enabled
+        permanent: yes
+        immediate: yes
+    - systemd:
+        name: named.service
+        state: stopped
+    - systemd:
+        name: named-chroot.service
+        state: stopped
+      when: chroot
+    - shell: /usr/bin/echo `/usr/bin/date +%Y%m%d`01
+      register: soa_serial
+    - copy:
+        dest: /etc/named.conf
+        content: |
+          options {
+                  directory "/var/named";
+                  dnssec-enable no;
+                  dnssec-validation no;
+          };
+
+          zone "example.com" {
+                  type master;
+                  file "example.com.zone";
+          };
+
+          zone "122.168.192.in-addr.arpa" {
+                  type master;
+                  file "122.168.192.in-addr.arpa.zone";
+          };
+    - copy:
+        dest: /var/named/example.com.zone
+        content: |
+          $TTL 86400
+          @       IN      SOA     dns.example.com. root.example.com. (
+                  {{ soa_serial.stdout }}
+                  10800
+                  3600
+                  604800
+                  86400 )
+
+                  IN      NS      dns.example.com.
+          alpha   IN      A       192.168.122.1
+          beta    IN      A       192.168.122.2
+          dns     IN      A       192.168.122.3
+    - copy:
+        dest: /var/named/122.168.192.in-addr.arpa.zone
+        content: |
+          $TTL 86400
+          @       IN      SOA     dns.example.com. root.example.com. (
+                  {{ soa_serial.stdout }}
+                  10800
+                  3600
+                  604800
+                  86400 )
+
+                  IN      NS      dns.example.com.
+          1       IN      PTR     alpha.example.com.
+          2       IN      PTR     beta.example.com.
+          3       IN      PTR     dns.example.com.
+    - systemd:
+        name: "{{ 'named-chroot.service' if (chroot) else 'named.service' }}"
+        state: restarted
