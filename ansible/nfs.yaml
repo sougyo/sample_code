@@ -1,0 +1,39 @@
+- hosts: all
+  tasks:
+    - yum:
+        name:
+          - nfs-utils
+    - firewalld:
+        service: "{{ item }}"
+        state: enabled
+        permanent: yes
+        immediate: yes
+      loop:
+      - mountd
+      - nfs
+      - rpc-bind
+    - seboolean:
+        name: "{{ item }}"
+        state: yes
+        persistent: yes
+      with_items:
+        - nfs_export_all_ro
+        - nfs_export_all_rw
+    - file:
+        state: directory
+        path: /work
+    - lineinfile:
+        dest: /etc/exports.d/mytest.exports
+        create: yes
+        regexp: "^/work"
+        line: "/work 192.168.0.0/24(rw,no_root_squash)"
+    - systemd:
+        enabled: yes
+        state: started
+        name: "{{ item }}"
+      with_items:
+        - rpcbind.service
+        - nfs-server.service
+    - systemd:
+        state: reloaded
+        name: nfs-server.service
