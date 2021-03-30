@@ -16,7 +16,7 @@
         name: "{{ item }}"
         state: yes
         persistent: yes
-      with_items:
+      loop:
         - nfs_export_all_ro
         - nfs_export_all_rw
     - file:
@@ -31,7 +31,7 @@
         enabled: yes
         state: started
         name: "{{ item }}"
-      with_items:
+      loop:
         - rpcbind.service
         - nfs-server.service
     - systemd:
