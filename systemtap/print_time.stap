@@ -1,0 +1,10 @@
+#!/usr/bin/stap
+
+probe begin {
+  printf("[%s]\n", ctime(gettimeofday_s()))
+  printf("%d\n", gettimeofday_s())
+  printf("%d\n", gettimeofday_ms())
+  printf("%d\n", gettimeofday_us())
+  printf("%d\n", gettimeofday_ns())
+  exit()
+}
