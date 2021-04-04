@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+</head>
+<body>
+  <canvas id="drawing"></canvas>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.101.1/build/three.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.101.1/examples/js/controls/OrbitControls.js"></script>
+  <script>
+    const width = window.innerWidth;
+    const height = window.innerHeight;
+
+    const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(75, width / height);
+    camera.position.set(0, 0, 400);
+    const renderer = new THREE.WebGLRenderer({
+      canvas: document.querySelector('#drawing'),
+      antialias: true
+    });
+    renderer.setSize(width, height);
+    const geometry = new THREE.BoxGeometry(100, 100, 100);
+    const material = new THREE.MeshNormalMaterial();
+    const box = new THREE.Mesh(geometry, material);
+    scene.add(box);
+    renderer.render(scene, camera);
+
+    const controls = new THREE.OrbitControls(camera, renderer.domElement);
+    controls.addEventListener('change', function() {
+      renderer.render( scene, camera);
+    });
+  </script>
+</body>
+</html>
