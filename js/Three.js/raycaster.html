@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+</head>
+<body>
+  <canvas id="drawing"></canvas>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/105/three.min.js"></script>
+  <script>
+    const width = window.innerWidth;
+    const height = window.innerHeight;
+
+    const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(75, width / height);
+    camera.position.set(0, 0, 5);
+
+    const renderer = new THREE.WebGLRenderer({
+      canvas: document.querySelector('#drawing')
+    });
+    renderer.setSize(width, height);
+
+    const sprite = new THREE.Sprite(new THREE.SpriteMaterial({ color: '#69f' }));
+    group = new THREE.Group();
+    scene.add(group);
+    group.add(sprite);
+
+    let selectedObject = null;
+    const raycaster = new THREE.Raycaster();
+    document.addEventListener('pointermove', onPointerMove);
+    const pointer = new THREE.Vector2();
+
+    animate();
+    function animate() {
+      renderer.render(scene, camera);
+      requestAnimationFrame(animate);
+    }
+
+    function onPointerMove(event) {
+      if (selectedObject) {
+        selectedObject.material.color.set('#69f');
+        selectedObject = null;
+      }
+
+      pointer.x = (event.clientX / window.innerWidth) * 2 - 1;
+      pointer.y = -(event.clientY / window.innerHeight) * 2 + 1;
+
+      raycaster.setFromCamera(pointer, camera);
+
+      const intersects = raycaster.intersectObject(group, true);
+
+      if (intersects.length > 0) {
+        const res = intersects.filter(function(res) {
+                                        return res && res.object;
+                                      })[0];
+        if (res && res.object) {
+          selectedObject = res.object;
+          selectedObject.material.color.set('#f00');
+        }
+      }
+    }
+  </script>
+</body>
+</html>
