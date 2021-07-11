@@ -1,1 +1,3 @@
-systemctl enable mount_nfs.service
+Setup:
+# cp mount_nfs.service /etc/systemd/system
+# systemctl enable mount_nfs.service
