@@ -1,0 +1,11 @@
+[Unit]
+After=multi-user.target
+
+[Service]
+RemainAfterExit=yes
+Type=oneshot
+User=root
+ExecStart=mount 192.168.122.1:/nfs /mnt
+
+[Install]
+WantedBy=multi-user.target
