@@ -30,7 +30,7 @@ struct Slabinfo {
 	active_objs:  i32,
 	num_objs:     i32,
 	objsize:      i32,
-	objperslab:	  i32,
+	objperslab:   i32,
 	pagesperslab: i32,
 	active_slabs: i32,
 	num_slabs:    i32,
@@ -103,7 +103,7 @@ impl Iterator for Info {
 		loop {
 			line.clear();
 			let s = match self.stdin.read_line(&mut line) {
-				Ok(s)	=> s,
+				Ok(s)  => s,
 				Err(_) => break
 			};
 
