@@ -264,12 +264,12 @@ fn recursive_put(depth: usize, h: Arc<PieceVec>, b_orig: &mut Board, r_pos: usiz
 
 fn start(h: Arc<PieceVec>) {
 	let b : Board = Board::new(&Default::default());
-    let rc_list = (0..b.row).into_iter()
-         .map(|r| (0..b.col).into_iter().map(move |c| (r, c)))
-         .flatten()
-         .collect::<Vec<_>>();
+	let rc_list = (0..b.row).into_iter()
+		 .map(|r| (0..b.col).into_iter().map(move |c| (r, c)))
+		 .flatten()
+		 .collect::<Vec<_>>();
 
-    rc_list.par_iter().for_each(|(r, c)| {
+	rc_list.par_iter().for_each(|(r, c)| {
 		recursive_put(0, h.clone(), &mut Board::new(&Default::default()), *r, *c);
-    });
+	});
 }
