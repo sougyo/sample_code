@@ -1,7 +1,7 @@
 use std::sync::Arc;
 use std::io::{self, Write};
 use std::collections::HashSet;
-use std::thread;
+use rayon::prelude::*;
 
 type PieceData = [[i32; 5]; 5];
 type BoardData = [[i32; 6]; 10];
@@ -263,22 +263,13 @@ fn recursive_put(depth: usize, h: Arc<PieceVec>, b_orig: &mut Board, r_pos: usiz
 }
 
 fn start(h: Arc<PieceVec>) {
-	let mut v = Vec::new();
-	let b_dummy: Board = Board::new(&Default::default());
+	let b : Board = Board::new(&Default::default());
+    let rc_list = (0..b.row).into_iter()
+         .map(|r| (0..b.col).into_iter().map(move |c| (r, c)))
+         .flatten()
+         .collect::<Vec<_>>();
 
-	for r in 0..b_dummy.row {
-		let hh = h.clone();
-		
-		let handler = thread::spawn(move || {
-			let mut b: Board = Board::new(&Default::default());
-			for c in 0..b.col {
-				recursive_put(0, hh.clone(), &mut b, r, c);
-			}
-		});
-		v.push(handler);
-	}
-
-	for e in v {
-		e.join().unwrap();
-	}
+    rc_list.par_iter().for_each(|(r, c)| {
+		recursive_put(0, h.clone(), &mut Board::new(&Default::default()), *r, *c);
+    });
 }
