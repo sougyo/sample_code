@@ -159,8 +159,8 @@ fn main() {
 		let mut tmp = keys
 			.iter()
 			.map(|k| (k, current.get(*k).zip(prev.get(*k))
-										.map(|(c,p)| c.minus(p)) // current minus prev
-										.flatten()))
+						.map(|(c,p)| c.minus(p)) // current minus prev
+						.flatten()))
 			.filter(|(_,o)| *o != None)
 			.map(|(k,o)| (k, o.unwrap()))
 			.filter(|(_,s)| s.total_size != 0)
