@@ -17,10 +17,10 @@ fn main() {
 	s1.write_all(b"test message").unwrap();
 	match s2.read(&mut buf) {
 		Ok(n) => {
-            if n > 0 { 
-                println!("{}", std::str::from_utf8(&buf[0..n]).unwrap())
-            }
-        },
+			if n > 0 { 
+				println!("{}", std::str::from_utf8(&buf[0..n]).unwrap())
+			}
+		},
 		Err(_) => panic!("read error\n"),
 	}
 }
