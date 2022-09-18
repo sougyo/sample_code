@@ -1,0 +1,11 @@
+psql -h svc-postgres.default.svc.cluster.local -U postgres
+create database testdb;
+\l
+\c testdb
+create table staff (name text);
+insert into staff values ('member1');
+insert into staff values ('member2');
+insert into staff values ('member3');
+psql -h svc-postgres.default.svc.cluster.local -U postgres testdb
+
+sudo docker build -t nodejssrv .

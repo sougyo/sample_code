@@ -1,0 +1,28 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: my-nodejs
+  name: my-nodejs
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: my-nodejs
+  template:
+    metadata:
+      labels:
+        app: my-nodejs
+    spec:
+      containers:
+      - name: my-nodejs
+        image: nodejssrv
+        imagePullPolicy: Never
+        ports:
+        - containerPort: 8000
+        envFrom:
+        - configMapRef:
+            name: nodejs-config
+        env:
+        - name: "PORT"
+          value: "8000"

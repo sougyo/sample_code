@@ -1,0 +1,25 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: my-postgres
+  labels:
+    app: my-postgres
+spec:
+  containers:
+  - name: my-postgres
+    image: postgres
+    volumeMounts:
+    - mountPath: /var/lib/postgresql/data
+      name: data-volume
+    env:
+    - name: POSTGRES_USER
+      value: postgres
+    - name: POSTGRES_PASSWORD
+      value: postgres
+    ports:
+    - containerPort: 5432
+  volumes:
+  - name: data-volume
+    persistentVolumeClaim:
+      claimName: postgres-claim
+
