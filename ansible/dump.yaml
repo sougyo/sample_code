@@ -1,0 +1,10 @@
+- hosts: all
+  - lineinfile:
+      path: /etc/systemd/system.conf
+      regex: DefaultLimitCORE
+      line: DefaultLimitCORE=infinity
+  - blockinfile:
+      path: /etc/sysctl.conf
+      block: |
+        kernel.core_pattern=/tmp/core.%e.%p
+        fs.suid_dumpable=2

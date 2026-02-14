@@ -1,0 +1,56 @@
+---
+- hosts: all
+  tasks:
+  - yum:
+      state: latest
+      name:
+      - ansible
+      - vim
+      - gdb
+      - lsof
+      - net-tools
+      - tcpdump
+      - wireshark
+      - strace
+      - ltrace
+      - systemtap
+      - perf
+      - sysstat
+      - procps-ng
+      - bind-utils
+      - nfs-utils
+      - cifs-utils
+      - gcc
+      - gcc-c++
+      - make
+      - ruby
+      - ruby-irb
+      - golang
+      - rust
+      - git
+      - ctags
+      - global
+      - rpm-build
+      - mailx
+      - mutt
+      - telnet
+      - psmisc
+      - man-pages
+      - autoconf
+      - automake
+      - crash
+      - tmux
+  - copy:
+      dest: /root/.vimrc
+      content: |
+        set noswapfile
+        set number
+        set tabstop=4
+        set paste
+  - file:
+      path: /root/.vim/plugin
+      state: directory
+  - copy:
+      src: /usr/share/gtags/gtags.vim
+      dest: /root/.vim/plugin
+

@@ -1,0 +1,34 @@
+- hosts: all
+  tasks:
+  - yum:
+      state: latest
+      name:
+      - pcp-zeroconf
+  - lineinfile:
+      path: /etc/pcp/pmcd/pmcd.options
+      insertafter: '^# IP address'
+      line: "-i 0.0.0.0"
+    notify: restart_pcp
+  - lineinfile:
+      path: /etc/pcp/pmcd/pmcd.conf
+      regexp: '^allow'
+      line: 'allow hosts ":*" : fetch;'
+    notify: restart_pcp
+  - service:
+      name: "{{ item }}"
+      state: started
+      enabled: yes
+    loop:
+    - pmcd
+    - pmlogger
+    when: 0
+  - firewalld:
+      port: 44321/tcp
+      permanent: yes
+      immediate: yes
+      state: enabled
+  handlers:
+  - name: restart_pcp
+    service:
+      name: pmcd
+      state: restarted
